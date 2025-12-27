@@ -29,7 +29,7 @@ struct ScreenItem: Identifiable {
 }
 
 struct DeviceProfile: Identifiable, Hashable {
-    let id = UUID()
+    let id: String
     let name: String
     let family: DeviceFamily
     let displaySize: CGSize
@@ -55,15 +55,7 @@ enum DeviceFamily: String {
 struct DeviceColor: Identifiable, Hashable {
     let id: String
     let name: String
-    let rgb: SIMD3<Double>
-
-    var color: Color {
-        Color(red: rgb.x, green: rgb.y, blue: rgb.z)
-    }
-
-    var nsColor: NSColor {
-        NSColor(srgbRed: rgb.x, green: rgb.y, blue: rgb.z, alpha: 1)
-    }
+    let frameAssetName: String
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
@@ -98,34 +90,27 @@ struct ScreenInsets: Hashable {
 }
 
 struct FrameStyle: Hashable {
-    let assetPrefix: String
     let insets: ScreenInsets
     let screenCornerRadiusRatio: CGFloat
     let contentScale: CGFloat
-
-    func assetName(for color: DeviceColor) -> String {
-        "\(assetPrefix)_\(color.id)"
-    }
 }
 
 enum DeviceLibrary {
-    static let graphite = DeviceColor(id: "graphite", name: "Graphite", rgb: SIMD3(0.18, 0.18, 0.2))
-    static let natural = DeviceColor(id: "natural", name: "Natural Titanium", rgb: SIMD3(0.6, 0.57, 0.51))
-    static let blue = DeviceColor(id: "blue", name: "Blue Titanium", rgb: SIMD3(0.21, 0.33, 0.48))
-    static let pink = DeviceColor(id: "pink", name: "Pink", rgb: SIMD3(0.94, 0.79, 0.83))
-    static let spaceBlack = DeviceColor(id: "spaceBlack", name: "Space Black", rgb: SIMD3(0.08, 0.08, 0.09))
-    static let silver = DeviceColor(id: "silver", name: "Silver", rgb: SIMD3(0.85, 0.86, 0.88))
-    static let midnight = DeviceColor(id: "midnight", name: "Midnight", rgb: SIMD3(0.07, 0.09, 0.14))
+    static let blue = DeviceColor(id: "blue", name: "Blue", frameAssetName: "iphone14_blue")
+    static let midnight = DeviceColor(id: "midnight", name: "Midnight", frameAssetName: "iphone14_midnight")
+    static let purple = DeviceColor(id: "purple", name: "Purple", frameAssetName: "iphone14_purple")
+    static let red = DeviceColor(id: "red", name: "Red", frameAssetName: "iphone14_red")
+    static let starlight = DeviceColor(id: "starlight", name: "Starlight", frameAssetName: "iphone14_starlight")
 
     static let catalog: [DeviceProfile] = [
         DeviceProfile(
+            id: "iphone14",
             name: "iPhone 14",
             family: .iPhone,
             displaySize: CGSize(width: 2532, height: 1170),
             cornerRadius: 106,
-            colors: [blue, pink, silver, midnight],
+            colors: [blue, midnight, purple, red, starlight],
             frameStyle: FrameStyle(
-                assetPrefix: "iphone14",
                 insets: ScreenInsets(
                     top: 6.0 / 850.0,
                     leading: 10.0 / 421.0,
@@ -154,12 +139,13 @@ enum DeviceLibrary {
 
 enum FrameRenderer {
     static func pngData(for item: ScreenItem) throws -> Data {
-        if let style = item.device.frameStyle,
-           let frameImage = NSImage(named: NSImage.Name(style.assetName(for: item.color))) {
-            return try renderUsingAsset(item: item, frameImage: frameImage, style: style)
-        } else {
-            return try renderWithRoundedFrame(item: item)
+        guard let style = item.device.frameStyle else {
+            throw NSError(domain: "FrameRenderer", code: 2, userInfo: [NSLocalizedDescriptionKey: "No frame style for \(item.device.name)"])
         }
+        guard let frameImage = NSImage(named: NSImage.Name(item.color.frameAssetName)) else {
+            throw NSError(domain: "FrameRenderer", code: 3, userInfo: [NSLocalizedDescriptionKey: "Missing frame asset \(item.color.frameAssetName)"])
+        }
+        return try renderUsingAsset(item: item, frameImage: frameImage, style: style)
     }
 
     private static func renderUsingAsset(item: ScreenItem, frameImage: NSImage, style: FrameStyle) throws -> Data {
@@ -189,32 +175,6 @@ enum FrameRenderer {
             let data = bitmap.representation(using: .png, properties: [:])
         else {
             throw NSError(domain: "FrameRenderer", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to render framed asset"])
-        }
-        return data
-    }
-
-    private static func renderWithRoundedFrame(item: ScreenItem) throws -> Data {
-        let margin: CGFloat = 120
-        let imageSize = item.image.size
-        let canvas = CGSize(width: imageSize.width + margin * 2, height: imageSize.height + margin * 2)
-        let image = NSImage(size: canvas)
-        image.lockFocus()
-
-        let rect = CGRect(origin: .zero, size: canvas)
-        item.color.nsColor.setFill()
-        let path = NSBezierPath(roundedRect: rect, xRadius: item.device.cornerRadius, yRadius: item.device.cornerRadius)
-        path.fill()
-
-        let screenRect = rect.insetBy(dx: margin, dy: margin)
-        item.image.draw(in: screenRect, from: .zero, operation: .sourceOver, fraction: 1, respectFlipped: true, hints: nil)
-
-        image.unlockFocus()
-        guard
-            let tiff = image.tiffRepresentation,
-            let bitmap = NSBitmapImageRep(data: tiff),
-            let data = bitmap.representation(using: .png, properties: [:])
-        else {
-            throw NSError(domain: "FrameRenderer", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unable to render frame"])
         }
         return data
     }
@@ -358,7 +318,7 @@ struct ContentView: View {
                 else { return }
 
                 let device = DeviceLibrary.matchingDevice(for: image.size)
-                let color = device.colors.first ?? DeviceLibrary.graphite
+                let color = device.colors.first ?? DeviceLibrary.blue
                 let newItem = ScreenItem(url: url, image: image, device: device, color: color)
 
                 DispatchQueue.main.async {
@@ -508,10 +468,6 @@ struct ScreenRow: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                Circle()
-                    .fill(item.color.color)
-                    .frame(width: 24, height: 24)
-                    .overlay(Circle().stroke(Color.white.opacity(0.4), lineWidth: 1))
                 Button(role: .destructive, action: onDelete) {
                     Label("Delete", systemImage: "trash")
                         .labelStyle(.iconOnly)
@@ -596,37 +552,15 @@ struct DeviceFramePreview: View {
 
     @ViewBuilder
     private func frame(in availableSize: CGSize) -> some View {
-        if let style = device.frameStyle,
-           let frameImage = NSImage(named: NSImage.Name(style.assetName(for: color))) {
-            frameWithAsset(in: availableSize, style: style, frameImage: frameImage)
+        if let style = device.frameStyle {
+            if let frameImage = NSImage(named: NSImage.Name(color.frameAssetName)) {
+                frameWithAsset(in: availableSize, style: style, frameImage: frameImage)
+            } else {
+                missingAssetView(message: "Asset \(color.frameAssetName) not found.")
+            }
         } else {
-            simpleFrame(in: availableSize)
+            missingAssetView(message: "No frame style for \(device.name).")
         }
-    }
-
-    private func simpleFrame(in availableSize: CGSize) -> some View {
-        let aspect = image.size.width / image.size.height
-        let containerAspect = availableSize.width / availableSize.height
-        let previewWidth: CGFloat
-        if containerAspect > aspect {
-            previewWidth = availableSize.height * aspect
-        } else {
-            previewWidth = availableSize.width
-        }
-        let previewHeight = previewWidth / aspect
-
-        return ZStack {
-            RoundedRectangle(cornerRadius: device.cornerRadius / 4, style: .continuous)
-                .fill(color.color)
-                .shadow(color: Color.black.opacity(0.3), radius: 12, y: 6)
-            Image(nsImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .padding(EdgeInsets(top: 20, leading: 20, bottom: 20, trailing: 20))
-                .clipShape(RoundedRectangle(cornerRadius: device.cornerRadius / 3, style: .continuous))
-        }
-        .frame(width: previewWidth, height: previewHeight)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func frameWithAsset(in availableSize: CGSize, style: FrameStyle, frameImage: NSImage) -> some View {
@@ -664,6 +598,23 @@ struct DeviceFramePreview: View {
         let containerBottomRect = rectFromTopToBottom(rect, containerHeight: previewHeight)
         let fittedBottom = aspectFitRect(for: image.size, in: containerBottomRect)
         return rectFromBottomToTop(fittedBottom, containerHeight: previewHeight)
+    }
+
+    private func missingAssetView(message: String) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(Color.secondary, style: StrokeStyle(lineWidth: 2, dash: [5]))
+            VStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.largeTitle)
+                    .foregroundStyle(.secondary)
+                Text(message)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
