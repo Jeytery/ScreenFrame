@@ -101,6 +101,14 @@ enum DeviceLibrary {
     static let purple = DeviceColor(id: "purple", name: "Purple", frameAssetName: "iphone14_purple")
     static let red = DeviceColor(id: "red", name: "Red", frameAssetName: "iphone14_red")
     static let starlight = DeviceColor(id: "starlight", name: "Starlight", frameAssetName: "iphone14_starlight")
+    static let ultramarine = DeviceColor(id: "ultramarine", name: "Ultramarine", frameAssetName: "iPhone 16 - Ultramarine - Portrait")
+    static let pink16 = DeviceColor(id: "pink16", name: "Pink", frameAssetName: "iPhone 16 Plus - Pink - Portrait 2")
+    static let blackTitanium = DeviceColor(id: "blackTitanium", name: "Black Titanium", frameAssetName: "iPhone 16 Pro - Black Titanium - Portrait 2")
+    static let desertTitanium = DeviceColor(id: "desertTitanium", name: "Desert Titanium", frameAssetName: "iPhone 16 Pro Max - Desert Titanium - Portrait 2")
+    static let mistBlue = DeviceColor(id: "mistBlue", name: "Mist Blue", frameAssetName: "iPhone 17 - Mist Blue - Portrait 1")
+    static let cosmicOrange = DeviceColor(id: "cosmicOrange", name: "Cosmic Orange", frameAssetName: "iPhone 17 Pro - Cosmic Orange - Portrait 1")
+    static let cosmicOrangeMax = DeviceColor(id: "cosmicOrangeMax", name: "Cosmic Orange", frameAssetName: "iPhone 17 Pro Max - Cosmic Orange - Portrait 1")
+    static let spaceGray = DeviceColor(id: "spaceGray", name: "Space Gray", frameAssetName: "iPad Pro 12.9 - Space Gray - Portrait")
 
     static let catalog: [DeviceProfile] = [
         DeviceProfile(
@@ -120,20 +128,172 @@ enum DeviceLibrary {
                 screenCornerRadiusRatio: 0.06,
                 contentScale: 0.97
             )
+        ),
+        DeviceProfile(
+            id: "iphone16",
+            name: "iPhone 16",
+            family: .iPhone,
+            displaySize: CGSize(width: 2556, height: 1179),
+            cornerRadius: 108,
+            colors: [ultramarine],
+            frameStyle: FrameStyle(
+                insets: ScreenInsets(
+                    top: 1.0 / 879.0,
+                    leading: 0,
+                    bottom: 1.0 / 879.0,
+                    trailing: 0
+                ),
+                screenCornerRadiusRatio: 0.06,
+                contentScale: 0.97
+            )
+        ),
+        DeviceProfile(
+            id: "iphone16Plus",
+            name: "iPhone 16 Plus",
+            family: .iPhone,
+            displaySize: CGSize(width: 2796, height: 1290),
+            cornerRadius: 112,
+            colors: [pink16],
+            frameStyle: FrameStyle(
+                insets: ScreenInsets(
+                    top: 2.0 / 964.0,
+                    leading: 0,
+                    bottom: 2.0 / 964.0,
+                    trailing: 0
+                ),
+                screenCornerRadiusRatio: 0.06,
+                contentScale: 0.97
+            )
+        ),
+        DeviceProfile(
+            id: "iphone16Pro",
+            name: "iPhone 16 Pro",
+            family: .iPhone,
+            displaySize: CGSize(width: 2556, height: 1179),
+            cornerRadius: 110,
+            colors: [blackTitanium],
+            frameStyle: FrameStyle(
+                insets: ScreenInsets(
+                    top: 3.0 / 884.0,
+                    leading: 0,
+                    bottom: 1.0 / 884.0,
+                    trailing: 0
+                ),
+                screenCornerRadiusRatio: 0.06,
+                contentScale: 0.97
+            )
+        ),
+        DeviceProfile(
+            id: "iphone16ProMax",
+            name: "iPhone 16 Pro Max",
+            family: .iPhone,
+            displaySize: CGSize(width: 2796, height: 1290),
+            cornerRadius: 118,
+            colors: [desertTitanium],
+            frameStyle: FrameStyle(
+                insets: ScreenInsets(
+                    top: 1.0 / 958.0,
+                    leading: 0,
+                    bottom: 1.0 / 958.0,
+                    trailing: 0
+                ),
+                screenCornerRadiusRatio: 0.06,
+                contentScale: 0.97
+            )
+        ),
+        DeviceProfile(
+            id: "iphone17",
+            name: "iPhone 17",
+            family: .iPhone,
+            displaySize: CGSize(width: 2556, height: 1179),
+            cornerRadius: 110,
+            colors: [mistBlue],
+            frameStyle: FrameStyle(
+                insets: ScreenInsets(
+                    top: 0.009101,
+                    leading: 0.011628,
+                    bottom: 0.009101,
+                    trailing: 0.011628
+                ),
+                screenCornerRadiusRatio: 0.06,
+                contentScale: 0.97
+            )
+        ),
+        DeviceProfile(
+            id: "iphone17Pro",
+            name: "iPhone 17 Pro",
+            family: .iPhone,
+            displaySize: CGSize(width: 2556, height: 1179),
+            cornerRadius: 112,
+            colors: [cosmicOrange],
+            frameStyle: FrameStyle(
+                insets: ScreenInsets(
+                    top: 0.006826,
+                    leading: 0.009302,
+                    bottom: 0.006826,
+                    trailing: 0.009302
+                ),
+                screenCornerRadiusRatio: 0.06,
+                contentScale: 0.97
+            )
+        ),
+        DeviceProfile(
+            id: "iphone17ProMax",
+            name: "iPhone 17 Pro Max",
+            family: .iPhone,
+            displaySize: CGSize(width: 2796, height: 1290),
+            cornerRadius: 120,
+            colors: [cosmicOrangeMax],
+            frameStyle: FrameStyle(
+                insets: ScreenInsets(
+                    top: 0.006263,
+                    leading: 0.010661,
+                    bottom: 0.006263,
+                    trailing: 0.010661
+                ),
+                screenCornerRadiusRatio: 0.06,
+                contentScale: 0.97
+            )
+        ),
+        DeviceProfile(
+            id: "ipadPro129",
+            name: "iPad Pro 12.9",
+            family: .iPad,
+            displaySize: CGSize(width: 2732, height: 2048),
+            cornerRadius: 140,
+            colors: [spaceGray],
+            frameStyle: FrameStyle(
+                insets: ScreenInsets(
+                    top: 0.004054,
+                    leading: 0.01048,
+                    bottom: 0.005405,
+                    trailing: 0.00786
+                ),
+                screenCornerRadiusRatio: 0.04,
+                contentScale: 0.97
+            )
         )
     ]
 
     static var fallback: DeviceProfile { catalog.first! }
 
     static func matchingDevice(for imageSize: CGSize) -> DeviceProfile {
+        guard let first = catalog.first else { return fallback }
         let sortedImage = [imageSize.width, imageSize.height].sorted()
+        var bestDevice = first
+        var bestScore = CGFloat.greatestFiniteMagnitude
+
         for profile in catalog {
             let sortedDevice = [profile.displaySize.width, profile.displaySize.height].sorted()
-            if abs(sortedImage[0] - sortedDevice[0]) < 15 && abs(sortedImage[1] - sortedDevice[1]) < 15 {
-                return profile
+            let widthDiff = abs(sortedImage[0] - sortedDevice[0]) / sortedDevice[0]
+            let heightDiff = abs(sortedImage[1] - sortedDevice[1]) / sortedDevice[1]
+            let score = widthDiff + heightDiff
+            if score < bestScore {
+                bestScore = score
+                bestDevice = profile
             }
         }
-        return catalog.first { $0.family == .macBook } ?? fallback
+        return bestDevice
     }
 }
 
@@ -264,6 +424,8 @@ struct ContentView: View {
                     .onDelete(perform: deleteItems(at:))
                 }
                 .listStyle(.inset)
+                .scrollContentBackground(.hidden)
+                .background(Color.clear)
                 .frame(minWidth: 320)
                 .frame(maxHeight: .infinity)
                 .focused($listFocused)
@@ -286,6 +448,7 @@ struct ContentView: View {
                 }
             }
             .padding()
+            .background(Color.clear)
         } detail: {
             PreviewPanel(item: selectedItem)
         }
@@ -442,9 +605,6 @@ struct DropHint: View {
                     .font(.largeTitle)
                 Text("Drag n drop your screenshots")
                     .font(.headline)
-                Text("Drop more files anytime to keep adding.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
             }
             .padding()
         }
@@ -457,44 +617,43 @@ struct ScreenRow: View {
     let onDelete: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(item.displayName)
-                        .font(.headline)
-                        .lineLimit(1)
-                    Text(item.device.name)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                Button(role: .destructive, action: onDelete) {
-                    Label("Delete", systemImage: "trash")
-                        .labelStyle(.iconOnly)
-                }
-                .buttonStyle(.borderless)
-                .help("Delete this screenshot")
-            }
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(item.displayName)
+                    .font(.headline)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
 
-            HStack {
+                HStack {
                 Picker("Device", selection: $item.device) {
                     ForEach(DeviceLibrary.catalog) { profile in
-                        Text("\(profile.family.rawValue) · \(profile.name)").tag(profile)
+                        Text(profile.name).tag(profile)
                     }
                 }
-                .labelsHidden()
+                    .labelsHidden()
 
-                Picker("Color", selection: $item.color) {
-                    ForEach(item.device.colors) { color in
-                        Text(color.name).tag(color)
+                    Picker("Color", selection: $item.color) {
+                        ForEach(item.device.colors) { color in
+                            Text(color.name).tag(color)
+                        }
                     }
+                    .labelsHidden()
                 }
-                .labelsHidden()
             }
+
+            Button(role: .destructive, action: onDelete) {
+                Label("Delete", systemImage: "trash")
+                    .labelStyle(.iconOnly)
+            }
+            .buttonStyle(.borderless)
+            .help("Delete this screenshot")
+            .foregroundStyle(.red)
         }
         .padding(8)
-        .background(isSelected ? Color.accentColor.opacity(0.08) : Color.clear)
-        .cornerRadius(10)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
+        )
         .onChange(of: item.device) { newDevice in
             if !newDevice.colors.contains(item.color), let firstColor = newDevice.colors.first {
                 item.color = firstColor
@@ -517,10 +676,6 @@ struct PreviewPanel: View {
                 DeviceFramePreview(image: item.image, device: item.device, color: item.color)
                     .padding()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-                Text("Use Download all to export framed assets as a ZIP archive.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
             } else {
                 VStack(spacing: 12) {
                     Image(systemName: "hand.tap")
