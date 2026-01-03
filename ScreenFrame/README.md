@@ -43,6 +43,11 @@ ScreenFrame is a macOS SwiftUI utility for wrapping screenshots with polished Ap
    - Provide `FrameStyle` with normalized `ScreenInsets`, `screenCornerRadiusRatio`, and `contentScale`.
 4. Optionally adjust `matchingDevice` if you need weighted logic for device selection.
 
+## Landscape Orientation Support
+
+- Every `ScreenItem` stores a `ScreenshotOrientation` derived from the dropped image dimensions (width greater than height ⇒ landscape).
+- Both the SwiftUI preview (`DeviceFramePreview`) and PNG export (`FrameRenderer`) rotate the device frame asset and remap `ScreenInsets` using the stored orientation, so landscape screenshots appear horizontally across previews, copies, and exports without modifying the screenshot itself.
+
 ## Rendering Notes
 
 - Rendering is AppKit-based (`NSImage` drawing) so screenshots can be exported even without previews showing.

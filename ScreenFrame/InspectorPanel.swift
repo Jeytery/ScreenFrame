@@ -80,28 +80,28 @@ struct InspectorPanel: View {
                 .frame(width: 70)
 
             Button {
-                binding.wrappedValue = adjustedValue(for: binding.wrappedValue - 0.01, within: bounds)
+                binding.wrappedValue = adjustedValue(for: binding.wrappedValue - 0.001, within: bounds)
             } label: {
                 Image(systemName: "minus.circle")
                     .symbolRenderingMode(.hierarchical)
             }
             .buttonStyle(.plain)
-            .help("Decrease by 0.01")
+            .help("Decrease by 0.001")
 
             Button {
-                binding.wrappedValue = adjustedValue(for: binding.wrappedValue + 0.01, within: bounds)
+                binding.wrappedValue = adjustedValue(for: binding.wrappedValue + 0.001, within: bounds)
             } label: {
                 Image(systemName: "plus.circle")
                     .symbolRenderingMode(.hierarchical)
             }
             .buttonStyle(.plain)
-            .help("Increase by 0.01")
+            .help("Increase by 0.001")
         }
     }
 
     private func adjustedValue(for candidate: Double, within bounds: ClosedRange<Double>) -> Double {
         let clamped = min(max(candidate, bounds.lowerBound), bounds.upperBound)
-        return (clamped * 100).rounded() / 100
+        return (clamped * 1000).rounded() / 1000
     }
 }
 

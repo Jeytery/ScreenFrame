@@ -22,7 +22,8 @@ struct PreviewPanel: View {
                     image: item.image,
                     device: item.device,
                     color: item.color,
-                    contentScale: effectiveContentScale(for: item)
+                    contentScale: effectiveContentScale(for: item),
+                    orientation: item.orientation
                 )
                     .padding()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -249,7 +249,7 @@ enum DeviceLibrary {
                     trailing: 0
                 ),
                 screenCornerRadiusRatio: 0,
-                contentScale: 0.922
+                contentScale: 0.923
             )
         )
     ]
@@ -273,5 +273,21 @@ enum DeviceLibrary {
             }
         }
         return bestDevice
+    }
+}
+
+extension ScreenInsets {
+    func oriented(for orientation: ScreenshotOrientation) -> ScreenInsets {
+        switch orientation {
+        case .portrait:
+            return self
+        case .landscape:
+            return ScreenInsets(
+                top: trailing,
+                leading: top,
+                bottom: leading,
+                trailing: bottom
+            )
+        }
     }
 }

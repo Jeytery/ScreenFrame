@@ -13,6 +13,7 @@ struct DeviceFramePreview: View {
     let device: DeviceProfile
     let color: DeviceColor
     let contentScale: CGFloat
+    let orientation: ScreenshotOrientation
 
     var body: some View {
         GeometryReader { proxy in
@@ -33,35 +34,42 @@ struct DeviceFramePreview: View {
         }
     }
 
+    @ViewBuilder
     private func frameWithAsset(in availableSize: CGSize, style: FrameStyle, frameImage: NSImage) -> some View {
-        let aspect = frameImage.size.width / frameImage.size.height
-        let containerAspect = availableSize.width / availableSize.height
-        let previewWidth: CGFloat
-        if containerAspect > aspect {
-            previewWidth = availableSize.height * aspect
-        } else {
-            previewWidth = availableSize.width
-        }
-        let previewHeight = previewWidth / aspect
-        let screenRectTop = style.insets.rectInTopCoordinate(in: CGSize(width: previewWidth, height: previewHeight))
-        let fittedTopRect = fittedRectForPreview(screenRectTop, previewHeight: previewHeight)
-        let scaledTopRect = scaleRect(fittedTopRect, scale: contentScale)
-        let cornerRadius = min(scaledTopRect.width, scaledTopRect.height) * style.screenCornerRadiusRatio
+        if let orientedFrame = frameImage.applying(orientation: orientation) {
+            let aspect = orientedFrame.size.width / orientedFrame.size.height
+            let containerAspect = availableSize.width / availableSize.height
+            let previewWidth: CGFloat = {
+                if containerAspect > aspect {
+                    return availableSize.height * aspect
+                } else {
+                    return availableSize.width
+                }
+            }()
+            let previewHeight = previewWidth / aspect
+            let orientedInsets = style.insets.oriented(for: orientation)
+            let screenRectTop = orientedInsets.rectInTopCoordinate(in: CGSize(width: previewWidth, height: previewHeight))
+            let fittedTopRect = fittedRectForPreview(screenRectTop, previewHeight: previewHeight)
+            let scaledTopRect = scaleRect(fittedTopRect, scale: contentScale)
+            let cornerRadius = min(scaledTopRect.width, scaledTopRect.height) * style.screenCornerRadiusRatio
 
-        return ZStack(alignment: .topLeading) {
-            Image(nsImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: scaledTopRect.width, height: scaledTopRect.height)
-                .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                .offset(x: scaledTopRect.minX, y: scaledTopRect.minY)
-            Image(nsImage: frameImage)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: previewWidth, height: previewHeight)
+            ZStack(alignment: .topLeading) {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: scaledTopRect.width, height: scaledTopRect.height)
+                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                    .offset(x: scaledTopRect.minX, y: scaledTopRect.minY)
+                Image(nsImage: orientedFrame)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: previewWidth, height: previewHeight)
+            }
+            .frame(width: previewWidth, height: previewHeight)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            missingAssetView(message: "Unable to rotate asset \(color.frameAssetName).")
         }
-        .frame(width: previewWidth, height: previewHeight)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func fittedRectForPreview(_ rect: CGRect, previewHeight: CGFloat) -> CGRect {

@@ -20,9 +20,13 @@ enum FrameRenderer {
     }
 
     private static func renderUsingAsset(item: ScreenItem, frameImage: NSImage, style: FrameStyle) throws -> Data {
-        let canvasSize = frameImage.size
+        guard let orientedFrame = frameImage.applying(orientation: item.orientation) else {
+            throw NSError(domain: "FrameRenderer", code: 4, userInfo: [NSLocalizedDescriptionKey: "Unable to orient frame asset"])
+        }
+        let canvasSize = orientedFrame.size
         let canvasRect = CGRect(origin: .zero, size: canvasSize)
-        let screenArea = style.insets.rectInBottomCoordinate(in: canvasSize)
+        let orientedInsets = style.insets.oriented(for: item.orientation)
+        let screenArea = orientedInsets.rectInBottomCoordinate(in: canvasSize)
         let fittedScreen = aspectFitRect(for: item.image.size, in: screenArea)
         let overrideScale = item.contentScaleOverride.map { CGFloat($0) } ?? style.contentScale
         let scaledScreen = scaleRect(fittedScreen, scale: overrideScale)
@@ -32,13 +36,13 @@ enum FrameRenderer {
         NSGraphicsContext.saveGraphicsState()
         let path = NSBezierPath(
             roundedRect: scaledScreen,
-            xRadius: scaledScreen.width * style.screenCornerRadiusRatio,
-            yRadius: scaledScreen.width * style.screenCornerRadiusRatio
+            xRadius: min(scaledScreen.width, scaledScreen.height) * style.screenCornerRadiusRatio,
+            yRadius: min(scaledScreen.width, scaledScreen.height) * style.screenCornerRadiusRatio
         )
         path.addClip()
         item.image.draw(in: scaledScreen, from: .zero, operation: .sourceOver, fraction: 1, respectFlipped: true, hints: nil)
         NSGraphicsContext.restoreGraphicsState()
-        frameImage.draw(in: canvasRect, from: .zero, operation: .sourceOver, fraction: 1, respectFlipped: true, hints: nil)
+        orientedFrame.draw(in: canvasRect, from: .zero, operation: .sourceOver, fraction: 1, respectFlipped: true, hints: nil)
         image.unlockFocus()
 
         guard
