@@ -21,24 +21,6 @@ struct ScreenRow: View {
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
                     .stroke(.secondary.opacity(0.25), lineWidth: 1)
             )
-//        if isSelected {
-//            view
-//                .controlSize(.small)
-//                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
-//                .overlay(
-//                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-//                        .stroke(.white.opacity(0.25), lineWidth: 1)
-//                )
-//                .environment(\.colorScheme, .dark)
-//        } else {
-//            view
-//                .controlSize(.small)
-//                .background(.quaternary.opacity(0.10), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
-//                .overlay(
-//                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-//                        .stroke(.secondary.opacity(0.25), lineWidth: 1)
-//                )
-//        }
     }
 
     private var deleteButtonBackground: some ShapeStyle {
@@ -58,7 +40,7 @@ struct ScreenRow: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(item.displayName)
                     .font(.headline)
-                    .lineLimit(2)
+                    .lineLimit(1)
                     .multilineTextAlignment(.leading)
 
                 HStack {

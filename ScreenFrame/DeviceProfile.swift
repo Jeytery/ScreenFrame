@@ -238,18 +238,18 @@ enum DeviceLibrary {
             id: "ipadPro129",
             name: "iPad Pro 12.9",
             family: .iPad,
-            displaySize: CGSize(width: 2732, height: 2048),
-            cornerRadius: 140,
+            displaySize: CGSize(width: 2752, height: 2064),
+            cornerRadius: 0,
             colors: [spaceGray],
             frameStyle: FrameStyle(
                 insets: ScreenInsets(
-                    top: 0.004054,
-                    leading: 0.01048,
-                    bottom: 0.005405,
-                    trailing: 0.00786
+                    top: 0,
+                    leading: 0,
+                    bottom: 0,
+                    trailing: 0
                 ),
-                screenCornerRadiusRatio: 0.04,
-                contentScale: 0.97
+                screenCornerRadiusRatio: 0,
+                contentScale: 0.94
             )
         )
     ]
