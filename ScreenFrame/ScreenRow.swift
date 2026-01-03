@@ -46,10 +46,6 @@ struct ScreenRow: View {
             .foregroundStyle(.red)
         }
         .padding(8)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
-        )
         .onChange(of: item.device) { newDevice in
             if !newDevice.colors.contains(item.color), let firstColor = newDevice.colors.first {
                 item.color = firstColor

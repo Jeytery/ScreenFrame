@@ -35,6 +35,7 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 140)
                     .contentShape(Rectangle())
+                    .padding(.bottom, 12)
                 
                 if !items.isEmpty {
                     Divider()
@@ -54,10 +55,10 @@ struct ContentView: View {
                 .listStyle(.inset)
                 .scrollContentBackground(.hidden)
                 .background(Color.clear)
+                .padding(.top, 8)
                 .frame(minWidth: 320)
                 .frame(maxHeight: .infinity)
                 .focused($listFocused)
-                
                 if !items.isEmpty {
                     Button(action: downloadAll) {
                         Label("Export all", systemImage: "square.and.arrow.down")
