@@ -249,7 +249,7 @@ enum DeviceLibrary {
                     trailing: 0
                 ),
                 screenCornerRadiusRatio: 0,
-                contentScale: 0.925
+                contentScale: 0.922
             )
         )
     ]
