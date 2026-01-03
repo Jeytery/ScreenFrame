@@ -9,6 +9,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import AppKit
 import Foundation
+import AlertToast
 
 struct ContentView: View {
     @State private var items: [ScreenItem] = []
@@ -17,6 +18,9 @@ struct ContentView: View {
     @State private var exportMessage: String?
     @State private var exportError: String?
     @State private var isExporting = false
+    @State private var copyError: String?
+    @State private var isCopying = false
+    @State private var showCopyToast = false
     @FocusState private var listFocused: Bool
     
     private var selectedItem: ScreenItem? {
@@ -75,6 +79,16 @@ struct ContentView: View {
             .background(Color.clear)
         } detail: {
             PreviewPanel(item: selectedItem)
+                .padding()
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button(action: copySelectedItem) {
+                            Label("Copy", systemImage: "doc.on.doc")
+                        }
+                        .labelStyle(.titleAndIcon)
+                        .disabled(selectedItem == nil || isCopying)
+                    }
+                }
         }
         .alert("Export complete", isPresented: Binding(get: { exportMessage != nil }, set: { if !$0 { exportMessage = nil } })) {
             Button("OK", role: .cancel) {
@@ -89,6 +103,16 @@ struct ContentView: View {
             }
         } message: {
             Text(exportError ?? "")
+        }
+        .alert("Copy failed", isPresented: Binding(get: { copyError != nil }, set: { if !$0 { copyError = nil } })) {
+            Button("OK", role: .cancel) {
+                copyError = nil
+            }
+        } message: {
+            Text(copyError ?? "")
+        }
+        .toast(isPresenting: $showCopyToast) {
+            AlertToast(type: .systemImage("doc.on.doc", Color.white), title: "Copied to clipboard")
         }
         .onDrop(of: [.fileURL], isTargeted: $isTargeted, perform: handleDrop(providers:))
     }
@@ -136,7 +160,7 @@ struct ContentView: View {
             break
         }
     }
-    
+
     private func downloadAll() {
         guard !items.isEmpty else { return }
         let panel = NSOpenPanel()
@@ -150,7 +174,24 @@ struct ContentView: View {
             Task { await exportItems(to: folder) }
         }
     }
-    
+
+    private func copySelectedItem() {
+        guard !isCopying, let item = selectedItem else { return }
+        isCopying = true
+        Task {
+            defer { isCopying = false }
+            do {
+                let data = try FrameRenderer.pngData(for: item)
+                let pasteboard = NSPasteboard.general
+                pasteboard.clearContents()
+                pasteboard.setData(data, forType: .png)
+                showCopyToast = true
+            } catch {
+                copyError = error.localizedDescription
+            }
+        }
+    }
+
     private func deleteItems(at offsets: IndexSet) {
         guard !items.isEmpty else { return }
         let sortedOffsets = offsets.sorted()
