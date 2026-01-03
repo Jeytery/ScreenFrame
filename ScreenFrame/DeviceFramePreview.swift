@@ -12,6 +12,7 @@ struct DeviceFramePreview: View {
     let image: NSImage
     let device: DeviceProfile
     let color: DeviceColor
+    let contentScale: CGFloat
 
     var body: some View {
         GeometryReader { proxy in
@@ -44,7 +45,7 @@ struct DeviceFramePreview: View {
         let previewHeight = previewWidth / aspect
         let screenRectTop = style.insets.rectInTopCoordinate(in: CGSize(width: previewWidth, height: previewHeight))
         let fittedTopRect = fittedRectForPreview(screenRectTop, previewHeight: previewHeight)
-        let scaledTopRect = scaleRect(fittedTopRect, scale: style.contentScale)
+        let scaledTopRect = scaleRect(fittedTopRect, scale: contentScale)
         let cornerRadius = min(scaledTopRect.width, scaledTopRect.height) * style.screenCornerRadiusRatio
 
         return ZStack(alignment: .topLeading) {

@@ -14,6 +14,7 @@ struct ScreenItem: Identifiable {
     let image: NSImage
     var device: DeviceProfile
     var color: DeviceColor
+    var contentScaleOverride: Double?
 
     var displayName: String { url.lastPathComponent }
 

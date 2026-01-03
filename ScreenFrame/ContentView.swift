@@ -22,10 +22,23 @@ struct ContentView: View {
     @State private var isCopying = false
     @State private var showCopyToast = false
     @FocusState private var listFocused: Bool
+    @State private var inspectorPresented = true
     
     private var selectedItem: ScreenItem? {
         guard let id = selectedItemID else { return nil }
         return items.first { $0.id == id }
+    }
+
+    private var selectedItemBinding: Binding<ScreenItem?> {
+        Binding(
+            get: { selectedItem },
+            set: { updatedItem in
+                guard let updatedItem else { return }
+                if let index = items.firstIndex(where: { $0.id == updatedItem.id }) {
+                    items[index] = updatedItem
+                }
+            }
+        )
     }
     
     var body: some View {
@@ -79,14 +92,22 @@ struct ContentView: View {
             .padding()
             .background(Color.clear)
         } detail: {
-            PreviewPanel(item: selectedItem)
+            PreviewPanel(item: selectedItemBinding)
                 .padding()
                 .toolbar {
+                    ToolbarItem {
+                        Button {
+                            inspectorPresented.toggle()
+                        } label: {
+                            Label("Inspector", systemImage: "sidebar.trailing")
+                        }
+                        .labelStyle(.iconOnly)
+                        .help("Toggle inspector")
+                    }
                     ToolbarItem(placement: .primaryAction) {
                         Button(action: copySelectedItem) {
                             Label("Copy", systemImage: "doc.on.doc")
                         }
-                        .labelStyle(.titleAndIcon)
                         .disabled(selectedItem == nil || isCopying)
                     }
                 }
@@ -116,6 +137,9 @@ struct ContentView: View {
             AlertToast(type: .systemImage("doc.on.doc", Color.white), title: "Copied to clipboard")
         }
         .onDrop(of: [.fileURL], isTargeted: $isTargeted, perform: handleDrop(providers:))
+        .inspector(isPresented: $inspectorPresented) {
+            InspectorPanel(item: selectedItemBinding)
+        }
     }
     
     private func handleDrop(providers: [NSItemProvider]) -> Bool {

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PreviewPanel: View {
-    let item: ScreenItem?
+    @Binding var item: ScreenItem?
 
     var body: some View {
         VStack {
@@ -18,7 +18,12 @@ struct PreviewPanel: View {
                 Text(item.color.name)
                     .foregroundStyle(.secondary)
 
-                DeviceFramePreview(image: item.image, device: item.device, color: item.color)
+                DeviceFramePreview(
+                    image: item.image,
+                    device: item.device,
+                    color: item.color,
+                    contentScale: effectiveContentScale(for: item)
+                )
                     .padding()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
@@ -36,5 +41,11 @@ struct PreviewPanel: View {
             }
         }
         .padding()
+    }
+
+    private func effectiveContentScale(for item: ScreenItem) -> CGFloat {
+        guard let style = item.device.frameStyle else { return 1 }
+        let override = item.contentScaleOverride.map { CGFloat($0) }
+        return override ?? style.contentScale
     }
 }

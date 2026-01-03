@@ -24,7 +24,8 @@ enum FrameRenderer {
         let canvasRect = CGRect(origin: .zero, size: canvasSize)
         let screenArea = style.insets.rectInBottomCoordinate(in: canvasSize)
         let fittedScreen = aspectFitRect(for: item.image.size, in: screenArea)
-        let scaledScreen = scaleRect(fittedScreen, scale: style.contentScale)
+        let overrideScale = item.contentScaleOverride.map { CGFloat($0) } ?? style.contentScale
+        let scaledScreen = scaleRect(fittedScreen, scale: overrideScale)
 
         let image = NSImage(size: canvasSize)
         image.lockFocus()
