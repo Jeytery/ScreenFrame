@@ -63,21 +63,58 @@ struct ScreenRow: View {
 
                 HStack {
                     pickerChrome(
-                        Picker("Device", selection: $item.device) {
+                        Menu {
                             ForEach(DeviceLibrary.catalog) { profile in
-                                Text(profile.name).tag(profile)
+                                Button {
+                                    item.device = profile
+                                } label: {
+                                    if profile.id == item.device.id {
+                                        Label(profile.name, systemImage: "checkmark")
+                                    } else {
+                                        Text(profile.name)
+                                    }
+                                }
                             }
+                        } label: {
+                            HStack(spacing: 6) {
+                                Text(item.device.name)
+                                    .lineLimit(1)
+                                Image(systemName: "chevron.down")
+                                    .font(.system(size: 11, weight: .semibold))
+                                    .opacity(0.8)
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
                         }
-                        .labelsHidden()
+                        .menuStyle(.borderlessButton)
+                        .fixedSize()
                     )
-
                     pickerChrome(
-                        Picker("Color", selection: $item.color) {
+                        Menu {
                             ForEach(item.device.colors) { color in
-                                Text(color.name).tag(color)
+                                Button {
+                                    item.color = color
+                                } label: {
+                                    if color.id == item.color.id {
+                                        Label(color.name, systemImage: "checkmark")
+                                    } else {
+                                        Text(color.name)
+                                    }
+                                }
                             }
+                        } label: {
+                            HStack(spacing: 6) {
+                                Text(item.color.name)
+                                    .lineLimit(1)
+                                Image(systemName: "chevron.down")
+                                    .font(.system(size: 11, weight: .semibold))
+                                    .opacity(0.8)
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
                         }
-                        .labelsHidden()
+                        .menuStyle(.borderlessButton)
+                        .fixedSize()
                     )
                 }
             }
