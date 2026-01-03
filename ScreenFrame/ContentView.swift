@@ -18,12 +18,12 @@ struct ContentView: View {
     @State private var exportError: String?
     @State private var isExporting = false
     @FocusState private var listFocused: Bool
-
+    
     private var selectedItem: ScreenItem? {
         guard let id = selectedItemID else { return nil }
         return items.first { $0.id == id }
     }
-
+    
     var body: some View {
         NavigationSplitView {
             VStack(spacing: 0) {
@@ -31,12 +31,11 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 140)
                     .contentShape(Rectangle())
-                    .onDrop(of: [.fileURL], isTargeted: $isTargeted, perform: handleDrop(providers:))
-
+                
                 if !items.isEmpty {
                     Divider()
                 }
-
+                
                 List(selection: $selectedItemID) {
                     ForEach($items) { $item in
                         ScreenRow(
@@ -54,7 +53,7 @@ struct ContentView: View {
                 .frame(minWidth: 320)
                 .frame(maxHeight: .infinity)
                 .focused($listFocused)
-
+                
                 if !items.isEmpty {
                     Button(action: downloadAll) {
                         Label("Export all", systemImage: "square.and.arrow.down")
@@ -91,12 +90,13 @@ struct ContentView: View {
         } message: {
             Text(exportError ?? "")
         }
+        .onDrop(of: [.fileURL], isTargeted: $isTargeted, perform: handleDrop(providers:))
     }
-
+    
     private func handleDrop(providers: [NSItemProvider]) -> Bool {
         let fileProviders = providers.filter { $0.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) }
         guard !fileProviders.isEmpty else { return false }
-
+        
         for provider in fileProviders {
             provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { data, _ in
                 guard
@@ -104,11 +104,11 @@ struct ContentView: View {
                     let url = URL(dataRepresentation: data, relativeTo: nil),
                     let image = NSImage(contentsOf: url)
                 else { return }
-
+                
                 let device = DeviceLibrary.matchingDevice(for: image.size)
                 let color = device.colors.first ?? DeviceLibrary.blue
                 let newItem = ScreenItem(url: url, image: image, device: device, color: color)
-
+                
                 DispatchQueue.main.async {
                     items.append(newItem)
                     selectedItemID = newItem.id
@@ -117,14 +117,14 @@ struct ContentView: View {
         }
         return true
     }
-
+    
     private func handleMoveCommand(_ direction: MoveCommandDirection) {
         guard !items.isEmpty else { return }
         guard let selectedID = selectedItemID, let index = items.firstIndex(where: { $0.id == selectedID }) else {
             selectedItemID = items.first?.id
             return
         }
-
+        
         switch direction {
         case .down:
             let next = min(index + 1, items.count - 1)
@@ -136,7 +136,7 @@ struct ContentView: View {
             break
         }
     }
-
+    
     private func downloadAll() {
         guard !items.isEmpty else { return }
         let panel = NSOpenPanel()
@@ -145,12 +145,12 @@ struct ContentView: View {
         panel.canChooseFiles = false
         panel.prompt = "Choose"
         panel.message = "Pick a folder for your framed screenshots."
-
+        
         if panel.runModal() == .OK, let folder = panel.url {
             Task { await exportItems(to: folder) }
         }
     }
-
+    
     private func deleteItems(at offsets: IndexSet) {
         guard !items.isEmpty else { return }
         let sortedOffsets = offsets.sorted()
@@ -162,13 +162,13 @@ struct ContentView: View {
         items.remove(atOffsets: offsets)
         updateSelectionAfterDeletion(removedIDs: removedIDs, fallbackIndex: fallbackIndex)
     }
-
+    
     private func deleteItem(id: ScreenItem.ID) {
         guard let index = items.firstIndex(where: { $0.id == id }) else { return }
         items.remove(at: index)
         updateSelectionAfterDeletion(removedIDs: [id], fallbackIndex: index)
     }
-
+    
     private func updateSelectionAfterDeletion(removedIDs: [ScreenItem.ID], fallbackIndex: Int?) {
         guard !items.isEmpty else {
             selectedItemID = nil
@@ -182,36 +182,38 @@ struct ContentView: View {
             selectedItemID = items.first?.id
         }
     }
-
+    
     @MainActor
     private func exportItems(to directory: URL) async {
         isExporting = true
         defer { isExporting = false }
         exportMessage = nil
         exportError = nil
-
+        
         do {
             let temp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
             try FileManager.default.createDirectory(at: temp, withIntermediateDirectories: true)
-
+            
             for item in items {
                 let outputURL = temp.appendingPathComponent(item.sanitizedName).appendingPathExtension("png")
                 let data = try FrameRenderer.pngData(for: item)
                 try data.write(to: outputURL)
             }
-
+            
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyyMMdd-HHmmss"
             let archiveName = "ScreenFrames-\(formatter.string(from: Date())).zip"
             let destination = directory.appendingPathComponent(archiveName)
             try ZipUtility.archive(folder: temp, to: destination)
             exportMessage = "Saved \(archiveName)"
-
+            
             try? FileManager.default.removeItem(at: temp)
         } catch {
             exportError = error.localizedDescription
         }
     }
+}
+    
 #Preview {
     ContentView()
 }
