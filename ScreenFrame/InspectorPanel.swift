@@ -18,31 +18,27 @@ struct InspectorPanel: View {
         .locale(Locale(identifier: "en_US_POSIX"))
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        List {
             if let item {
-                if let style = item.device.frameStyle, let binding = contentScaleBinding(for: style) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Content Scale")
+                Section(header: Text("Content Scale")) {
+                    if let style = item.device.frameStyle, let binding = contentScaleBinding(for: style) {
+                        Slider(value: binding, in: 0 ... 1)
+                        valueControls(binding: binding, bounds: sliderRange(for: style))
+                    } else {
+                        Text("This device does not expose adjustable content scale.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        Slider(value: binding, in: sliderRange(for: style), step: 0.001)
-                        valueControls(binding: binding, bounds: sliderRange(for: style))
                     }
-                } else {
-                    Text("This device does not expose adjustable content scale.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
             } else {
                 Text("Select a screenshot to edit its settings.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-
-            Spacer()
+                
         }
-        .padding()
-        .frame(minWidth: 240, maxWidth: 320, maxHeight: .infinity)
+        .scrollContentBackground(.hidden)
+        .background(Color.clear)
     }
 
     private func contentScaleBinding(for style: FrameStyle) -> Binding<Double>? {
@@ -78,7 +74,6 @@ struct InspectorPanel: View {
                 .textFieldStyle(.roundedBorder)
                 .labelsHidden()
                 .frame(width: 70)
-
             Button {
                 binding.wrappedValue = adjustedValue(for: binding.wrappedValue - 0.001, within: bounds)
             } label: {
@@ -87,7 +82,6 @@ struct InspectorPanel: View {
             }
             .buttonStyle(.plain)
             .help("Decrease by 0.001")
-
             Button {
                 binding.wrappedValue = adjustedValue(for: binding.wrappedValue + 0.001, within: bounds)
             } label: {
