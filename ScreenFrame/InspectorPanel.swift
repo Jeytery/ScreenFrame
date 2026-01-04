@@ -35,7 +35,6 @@ struct InspectorPanel: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-                
         }
         .scrollContentBackground(.hidden)
         .background(Color.clear)
